@@ -27,10 +27,16 @@ class res_partner(osv.Model):
             
             if record_partner:
                 ids = self.search(cr, uid, [('email','ilike',email),
-                                            ('parent_id','=',record_partner.id)], 
+                                            ('id','=',record_partner.id)], 
                                   context=context)
             
-            # If no matches were found, use the default implementation as fallback
+            # If no matches, try to search children
+            if not ids:
+                ids = self.search(cr, uid, [('email','ilike',email),
+                                            ('parent_id','=',record_partner.id)],
+                                  context=context) 
+            
+            # If still no matches were found, use the default implementation as fallback
             if ids:
                 return ids[0]
             else:
